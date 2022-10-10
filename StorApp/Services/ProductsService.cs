@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.EntityFrameworkCore;
 using StorApp.Dtos;
 using StorApp.Model;
 
@@ -14,44 +15,38 @@ namespace StorApp.Services
             this.logger = logger;
             this.context = context;
         }
-        public Product Add(Product product)
-        {
 
-            context.Products.Add(product);
+        public async Task<Product> AddAsync(Product product)
+        {
+          
+            await context.Products.AddAsync(product);
             context.SaveChanges();
             return product;
         }
 
-        public void Delete(Product product)
+        public void DeleteAsync(Product product)
         {
-
             context.Products.Remove(product);
             context.SaveChanges();
         }
 
-        public IList<Product> GetAll()
+        public async Task<IList<Product>?> GetAllAsync()
         {
-
-            var products = context.Products.OrderBy(p => p.Name).ToList();
-            return products;
+            return await context.Products.OrderBy(p => p.Name).ToListAsync();
         }
 
-        public Product GetById(int id)
-        {
 
-            var product = context.Products.SingleOrDefault(p => p.ProductId == id);
+        public async Task<Product?> GetByIdAsync(int id)
+        {
+            var product = await context.Products.SingleOrDefaultAsync(p => p.ProductId == id);
             if (product == null)
             {
                 logger.LogInformation(message: $"The Product With Id {id} Couldnt be found!");
             }
-
             return product;
         }
 
-
-
-
-        public void PartiallyUpdate(JsonPatchDocument<UpdateProductDto> dto, Product product)
+        public void PartiallyUpdateAsync(JsonPatchDocument<UpdateProductDto> dto, Product product)
         {
 
             var productToPatch = new UpdateProductDto()
@@ -74,10 +69,8 @@ namespace StorApp.Services
             context.SaveChanges();
         }
 
-
-        public void Update(Product product)
+        public void UpdateAsync(Product product)
         {
-
             context.Products.Update(product);
             context.SaveChanges();
         }

@@ -6,11 +6,11 @@ namespace StorApp.Services
 {
     public interface IProductsService
     {
-        Product Add(Product product);
-        void Delete(Product product);
-        IList<Product> GetAll();
-        Product GetById(int id);
-        void PartiallyUpdate(JsonPatchDocument<UpdateProductDto> dto, Product product);
-        void Update(Product product);
+        Task<Product> AddAsync(Product product);
+        void DeleteAsync(Product product);
+        Task<IList<Product>?> GetAllAsync();
+        Task<Product?> GetByIdAsync(int id);
+        void PartiallyUpdateAsync(JsonPatchDocument<UpdateProductDto> dto, Product product);
+        void UpdateAsync(Product product);
     }
 }

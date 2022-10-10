@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using StorApp.Dtos;
@@ -13,20 +14,22 @@ namespace StorApp.Controllers
     {
         private readonly ILogger<ProductsController> logger;
         private readonly IProductsService Service;
+        private readonly IMapper mapper;
 
-        public ProductsController(ILogger<ProductsController> logger, IProductsService Service)
+        public ProductsController(ILogger<ProductsController> logger, IProductsService Service , IMapper mapper)
         {
             this.logger = logger;
             this.Service = Service;
+            this.mapper = mapper;
         }
 
         [HttpGet("{productId}", Name = "GetProduct")]
-        public ActionResult GetProduct(int productId)
+        public async Task <ActionResult> GetProduct(int productId)
         {
             try
             {
                 //throw new Exception();
-                var products = Service.GetById(productId);
+                var products = await Service.GetByIdAsync(productId);
                 if (products == null)
                 {
                     logger.LogInformation($"The Product With Id {productId} Couldnt be found!");
@@ -42,17 +45,18 @@ namespace StorApp.Controllers
         }
 
         [HttpGet]
-        public ActionResult GetProducts()
+        public async Task<ActionResult> GetProducts()
         {
 
-            var products = Service.GetAll();
-            return Ok(products);
+            var products = await Service.GetAllAsync();
+
+            return Ok(mapper.Map<List<ProductWithoutBrands>>(products));
 
         }
 
 
         [HttpPost]
-        public ActionResult Create(CreateProductDto dto)
+        public async Task<ActionResult> Create(CreateProductDto dto)
         {
             var product = new Product()
             {
@@ -64,7 +68,7 @@ namespace StorApp.Controllers
             };
 
 
-            Service.Add(product);
+           await Service.AddAsync(product);
 
             return CreatedAtRoute("GetProduct", new
             {
@@ -75,10 +79,10 @@ namespace StorApp.Controllers
 
 
         [HttpPut("{productId}")]
-        public ActionResult UpdateProduct(UpdateProductDto dto, int productId)
+        public async Task<ActionResult> UpdateProduct(UpdateProductDto dto, int productId)
         {
 
-            var product = Service.GetById(productId);
+            var product = await Service.GetByIdAsync(productId);
             if (product == null)
                 return NotFound($"No genre was found with ID: {productId}");
 
@@ -87,34 +91,34 @@ namespace StorApp.Controllers
             product.Price = dto.Price;
             product.Amount = dto.Amount;
 
-            Service.Update(product);
+            Service.UpdateAsync(product);
 
             return NoContent();
         }
 
 
         [HttpPatch("{productId}")]
-        public ActionResult PartiallyUpdateProduct(JsonPatchDocument<UpdateProductDto> dto, int productId)
+        public async Task<ActionResult> PartiallyUpdateProduct(JsonPatchDocument<UpdateProductDto> dto, int productId)
         {
 
-            var existingproduct = Service.GetById(productId);
+            var existingproduct = await Service.GetByIdAsync(productId);
             if (existingproduct == null)
                 return NotFound($"No genre was found with ID: {productId}");
 
-            Service.PartiallyUpdate(dto, existingproduct);
+            Service.PartiallyUpdateAsync(dto, existingproduct);
             return NoContent();
         }
 
 
 
         [HttpDelete("{productId}")]
-        public ActionResult DeleteProduct(int productId)
+        public async Task<ActionResult> DeleteProduct(int productId)
         {
 
-            var product = Service.GetById(productId);
+            var product =await Service.GetByIdAsync(productId);
             if (product == null)
                 return NotFound($"No genre was found with ID: {productId}");
-            Service.Delete(product);
+            Service.DeleteAsync(product);
             return NoContent();
         }
 

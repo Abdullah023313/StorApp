@@ -49,6 +49,7 @@ builder.Services.AddTransient<IMailServices, MockMailServises>();
 builder.Services.AddTransient<IMailServices, StorMailServices>();
 #endif
 
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
