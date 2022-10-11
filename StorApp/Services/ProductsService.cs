@@ -18,16 +18,16 @@ namespace StorApp.Services
 
         public async Task<Product> AddAsync(Product product)
         {
-          
+
             await context.Products.AddAsync(product);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
             return product;
         }
 
-        public void DeleteAsync(Product product)
-        {
+        public async Task DeleteAsync(Product product)
+        { 
             context.Products.Remove(product);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
 
         public async Task<IList<Product>?> GetAllAsync()
@@ -46,7 +46,7 @@ namespace StorApp.Services
             return product;
         }
 
-        public void PartiallyUpdateAsync(JsonPatchDocument<UpdateProductDto> dto, Product product)
+        public async Task PartiallyUpdateAsync(JsonPatchDocument<UpdateProductDto> dto, Product product)
         {
 
             var productToPatch = new UpdateProductDto()
@@ -66,13 +66,13 @@ namespace StorApp.Services
 
 
             context.Products.Update(product);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
 
-        public void UpdateAsync(Product product)
+        public async Task UpdateAsync(Product product)
         {
             context.Products.Update(product);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
     }
 }

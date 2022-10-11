@@ -91,7 +91,7 @@ namespace StorApp.Controllers
             product.Price = dto.Price;
             product.Amount = dto.Amount;
 
-            Service.UpdateAsync(product);
+            await Service.UpdateAsync(product);
 
             return NoContent();
         }
@@ -105,7 +105,7 @@ namespace StorApp.Controllers
             if (existingproduct == null)
                 return NotFound($"No genre was found with ID: {productId}");
 
-            Service.PartiallyUpdateAsync(dto, existingproduct);
+            await Service.PartiallyUpdateAsync(dto, existingproduct);
             return NoContent();
         }
 
@@ -118,7 +118,7 @@ namespace StorApp.Controllers
             var product =await Service.GetByIdAsync(productId);
             if (product == null)
                 return NotFound($"No genre was found with ID: {productId}");
-            Service.DeleteAsync(product);
+            await Service.DeleteAsync(product);
             return NoContent();
         }
 

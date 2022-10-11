@@ -7,10 +7,10 @@ namespace StorApp.Services
     public interface IProductsService
     {
         Task<Product> AddAsync(Product product);
-        void DeleteAsync(Product product);
+        Task DeleteAsync(Product product);
         Task<IList<Product>?> GetAllAsync();
         Task<Product?> GetByIdAsync(int id);
-        void PartiallyUpdateAsync(JsonPatchDocument<UpdateProductDto> dto, Product product);
-        void UpdateAsync(Product product);
+        Task PartiallyUpdateAsync(JsonPatchDocument<UpdateProductDto> dto, Product product);
+        Task UpdateAsync(Product product);
     }
 }
