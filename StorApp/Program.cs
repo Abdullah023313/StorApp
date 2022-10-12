@@ -8,20 +8,12 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
     .WriteTo.Console()
     .WriteTo.File("D:/Logger.txt", rollingInterval: RollingInterval.Day)
-        //.WriteTo.MSSqlServer(
-        //    connectionString: "Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = StorDB2;",
-        //    sinkOptions: new MSSqlServerSinkOptions
-        //    {
-        //        TableName = "LogEvents",
-        //    })
         .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
 
-//builder.Logging.ClearProviders();
-//builder.Logging.AddConsole();
 
-// Add services to the container.
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<StorDbContext>(options => options.UseSqlServer(connectionString));
 
@@ -69,4 +61,17 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+
 app.Run();
+
+
+//.WriteTo.MSSqlServer(
+//    connectionString: "Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = StorDB2;",
+//    sinkOptions: new MSSqlServerSinkOptions
+//    {
+//        TableName = "LogEvents",
+//    })
+
+//builder.Logging.ClearProviders();
+//builder.Logging.AddConsole();
+// Add services to the container.
