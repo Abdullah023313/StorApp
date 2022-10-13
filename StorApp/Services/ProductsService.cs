@@ -42,6 +42,8 @@ namespace StorApp.Services
             if (product == null)
             {
                 logger.LogInformation(message: $"The Product With Id {id} Couldnt be found!");
+                var maxId =await context.Products.MaxAsync(p => p.ProductId);
+                product =await context.Products.SingleOrDefaultAsync(p => p.ProductId == maxId);
             }
             return product;
         }
