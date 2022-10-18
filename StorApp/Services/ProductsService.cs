@@ -10,16 +10,18 @@ namespace StorApp.Services
         private readonly ILogger<ProductsService> logger;
         private readonly StorDbContext context;
 
+     
         public ProductsService(ILogger<ProductsService> logger, StorDbContext context)
         {
             this.logger = logger;
             this.context = context;
+
         }
+
 
         public async Task<Product> AddAsync(Product product)
         {
 
-          
             await context.Products.AddAsync(product);
             await context.SaveChangesAsync();
             return product;

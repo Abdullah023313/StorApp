@@ -1,17 +1,28 @@
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Serilog.Sinks.MSSqlServer;
 using StorApp.Model;
 using StorApp.Services;
 using StorApp.Services.StorApi.Services;
 
+
+
+
+var configuration = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json")
+    .Build();
+
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Information()
-    .WriteTo.Console()
-    .WriteTo.File("D:/Logger.txt", rollingInterval: RollingInterval.Day)
+        .WriteTo.Console()
+        .WriteTo.File(@"D:\LogFiles\Log.txt",rollingInterval:RollingInterval.Day)
+        .ReadFrom.Configuration(configuration)
         .CreateLogger();
+
 
 var builder = WebApplication.CreateBuilder(args);
 
+//builder.Logging.ClearProviders();
+//builder.Logging.AddConsole();
 
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -33,7 +44,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Host.UseSerilog();
 
-builder.Services.AddScoped<IProductsService, ProductsService>();
+builder.Services.AddScoped< IProductsService,ProductsService>();
 
 #if DEBUG
 builder.Services.AddTransient<IMailServices, MockMailServises>();
@@ -64,14 +75,3 @@ app.MapControllers();
 
 app.Run();
 
-
-//.WriteTo.MSSqlServer(
-//    connectionString: "Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = StorDB2;",
-//    sinkOptions: new MSSqlServerSinkOptions
-//    {
-//        TableName = "LogEvents",
-//    })
-
-//builder.Logging.ClearProviders();
-//builder.Logging.AddConsole();
-// Add services to the container.

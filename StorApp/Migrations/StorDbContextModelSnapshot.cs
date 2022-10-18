@@ -41,7 +41,7 @@ namespace StorApp.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("Brands");
+                    b.ToTable("Brands", (string)null);
                 });
 
             modelBuilder.Entity("StorApp.Model.Product", b =>
@@ -68,7 +68,7 @@ namespace StorApp.Migrations
 
                     b.HasKey("ProductId");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("StorApp.Model.Brand", b =>

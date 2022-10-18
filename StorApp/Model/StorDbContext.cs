@@ -16,8 +16,10 @@ namespace StorApp.Model
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.LogTo(log => Console.WriteLine(log),
-                new[] {DbLoggerCategory.Database.Command.Name},
-                LogLevel.Information);
+                new[] { DbLoggerCategory.Database.Command.Name },
+                LogLevel.Information)
+                .EnableSensitiveDataLogging();
+
         }
     }
 }

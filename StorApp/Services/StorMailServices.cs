@@ -11,7 +11,7 @@
                 mailTo = configuration["mailStrings:mailTo"];
                 this.logger = logger;
             }
-            public void Sned()
+            public void Send()
             {
                 logger.LogInformation($"{mailTo}");
             }

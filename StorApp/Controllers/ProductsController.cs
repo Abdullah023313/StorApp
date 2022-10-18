@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using StorApp.Dtos;
 using StorApp.Model;
 using StorApp.Services;
+using StorApp.Services.StorApi.Services;
 
 namespace StorApp.Controllers
 {
@@ -15,13 +16,16 @@ namespace StorApp.Controllers
         private readonly ILogger<ProductsController> logger;
         private readonly IProductsService Service;
         private readonly IMapper mapper;
+        private readonly IMailServices mail;
 
-        public ProductsController(ILogger<ProductsController> logger, IProductsService Service , IMapper mapper)
+        public ProductsController(ILogger<ProductsController> logger, IProductsService Service , IMapper mapper , IMailServices mail)
         {
             this.logger = logger;
             this.Service = Service;
             this.mapper = mapper;
+            this.mail = mail;
         }
+        
 
         [HttpGet("{productId}", Name = "GetProduct")]
         public async Task <ActionResult> GetProduct(int productId)
@@ -39,7 +43,7 @@ namespace StorApp.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogCritical($"Exception While handling a request to Product {productId} ", ex);
+                logger.LogError($"Exception While handling a request to Product {productId} ", ex);
                 return StatusCode(500, "try again or call the app administrator!");
             }
         }
@@ -49,11 +53,10 @@ namespace StorApp.Controllers
         {
 
             var products = await Service.GetAllAsync();
-
             return Ok(mapper.Map<List<ProductWithoutBrands>>(products));
 
         }
-
+    
 
         [HttpPost]
         public async Task<ActionResult> Create(CreateProductDto dto)
@@ -66,8 +69,6 @@ namespace StorApp.Controllers
                 Amount = dto.Amount,
 
             };
-
-
            await Service.AddAsync(product);
 
             return CreatedAtRoute("GetProduct", new
@@ -117,8 +118,16 @@ namespace StorApp.Controllers
 
             var product =await Service.GetByIdAsync(productId);
             if (product == null)
-                return NotFound($"No genre was found with ID: {productId}");
+            {
+                var products = await Service.GetAllAsync();
+                product = products?.FirstOrDefault(); ;
+                if (product == null)
+                {
+                    return NotFound($"No genre was found with ID: {productId}");
+                }
+            }
             await Service.DeleteAsync(product);
+            mail.Send();
             return NoContent();
         }
 

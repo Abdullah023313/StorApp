@@ -2,6 +2,6 @@
 {
     public interface IMailServices
     {
-        void Sned();
+        void Send();
     }
 }

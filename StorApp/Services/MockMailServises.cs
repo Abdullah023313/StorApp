@@ -1,4 +1,5 @@
-﻿using StorApp.Services.StorApi.Services;
+﻿using StorApp.Model;
+using StorApp.Services.StorApi.Services;
 
 namespace StorApp.Services
 {
@@ -6,14 +7,16 @@ namespace StorApp.Services
     {
         private readonly ILogger<MockMailServises> logger;
         private string mailTo = string.Empty;
+     
         public MockMailServises(ILogger<MockMailServises> logger, IConfiguration configuration)
         {
             mailTo = configuration["mailStrings:mailTo"];
             this.logger = logger;
         }
-        public void Sned()
+        public void Send()
         {
-            logger.LogInformation($"{mailTo}");
+           
+            logger.LogInformation($"{mailTo} ");
         }
     }
 }
