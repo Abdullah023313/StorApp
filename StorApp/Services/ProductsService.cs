@@ -19,6 +19,7 @@ namespace StorApp.Services
         public async Task<Product> AddAsync(Product product)
         {
 
+          
             await context.Products.AddAsync(product);
             await context.SaveChangesAsync();
             return product;
@@ -64,8 +65,6 @@ namespace StorApp.Services
             product.Name = productToPatch.Name;
             product.Description = productToPatch.Description;
             product.Price = productToPatch.Price;
-            product.Amount = productToPatch.Amount;
-
 
             context.Products.Update(product);
             await context.SaveChangesAsync();
