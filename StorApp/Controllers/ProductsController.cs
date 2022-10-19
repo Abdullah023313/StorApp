@@ -6,6 +6,8 @@ using StorApp.Dtos;
 using StorApp.Model;
 using StorApp.Services;
 using StorApp.Services.StorApi.Services;
+using System.Drawing.Printing;
+using System.Text.Json;
 
 namespace StorApp.Controllers
 {
@@ -18,6 +20,7 @@ namespace StorApp.Controllers
         private readonly IProductsRepository Service;
         private readonly IMapper mapper;
         private readonly IMailServices mail;
+        private readonly int maxPageSize = 50;
 
         public ProductsController(ILogger<ProductsController> logger, IProductsRepository Service , IMapper mapper , IMailServices mail)
         {
@@ -41,9 +44,14 @@ namespace StorApp.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> GetProducts()
+        public async Task<ActionResult> GetProducts(string? name, int? maxPrice, int minPrice = 0,int PageNumber=1, int pageSize = 10)
         {
-            var products = await Service.GetProductsAsync();
+            pageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
+
+            var (products, paginationData) = await Service.GetProductsAsync(PageNumber, pageSize, name:name, maxPrice:maxPrice,minPrice);
+
+            Response.Headers.Add("X-pagination", paginationData.ToString());
+
             return Ok(mapper.Map<List<ProductWithoutBrands>>(products));
 
         }

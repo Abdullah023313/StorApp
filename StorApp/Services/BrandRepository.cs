@@ -20,7 +20,7 @@ namespace StorApp.Services
         }
         public async Task<IList<Brand>?> GetBrandsAsync()
         {
-            return await context.Products.SelectMany(p => p.Brands).ToListAsync();
+            return await context.Products.SelectMany(p => p.Brands).Distinct().ToListAsync();
         }
 
         public async Task<IList<Brand>?> GetBrandsForProductAsync(int productId)
