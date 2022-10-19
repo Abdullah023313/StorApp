@@ -44,7 +44,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Host.UseSerilog();
 
-builder.Services.AddScoped< IProductsService,ProductsService>();
+builder.Services.AddScoped<IBrandRepository, BrandRepository>();
+builder.Services.AddScoped<IProductsRepository, ProductsRepository>();
 
 #if DEBUG
 builder.Services.AddTransient<IMailServices, MockMailServises>();

@@ -2,6 +2,6 @@
 {
     public interface IMailServices
     {
-        void Send();
+        void Send(int productId);
     }
 }

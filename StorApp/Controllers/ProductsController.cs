@@ -11,52 +11,43 @@ namespace StorApp.Controllers
 {
     [Route("api/Products")]
     [ApiController]
+
     public class ProductsController : ControllerBase
     {
         private readonly ILogger<ProductsController> logger;
-        private readonly IProductsService Service;
+        private readonly IProductsRepository Service;
         private readonly IMapper mapper;
         private readonly IMailServices mail;
 
-        public ProductsController(ILogger<ProductsController> logger, IProductsService Service , IMapper mapper , IMailServices mail)
+        public ProductsController(ILogger<ProductsController> logger, IProductsRepository Service , IMapper mapper , IMailServices mail)
         {
             this.logger = logger;
             this.Service = Service;
             this.mapper = mapper;
             this.mail = mail;
         }
-        
+
 
         [HttpGet("{productId}", Name = "GetProduct")]
-        public async Task <ActionResult> GetProduct(int productId)
+        public async Task<ActionResult> GetProduct(int productId)
         {
-            try
+            var products = await Service.GetProductAsync(productId);
+            if (products == null)
             {
-                //throw new Exception();
-                var products = await Service.GetByIdAsync(productId);
-                if (products == null)
-                {
-                    logger.LogInformation($"The Product With Id {productId} Couldnt be found!");
-                    return NotFound();
-                }
-                return Ok(products);
+                logger.LogInformation($"The product with ID {productId} could not be found!");
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                logger.LogError($"Exception While handling a request to Product {productId} ", ex);
-                return StatusCode(500, "try again or call the app administrator!");
-            }
+            return Ok(products);
         }
 
         [HttpGet]
         public async Task<ActionResult> GetProducts()
         {
-
-            var products = await Service.GetAllAsync();
-            return Ok(mapper.Map<List<ProductWithoutBrands>>(products));
+            var products = await Service.GetProductsAsync();
+            //return Ok(mapper.Map<List<ProductWithoutBrands>>(products));
+            return Ok((products));
 
         }
-    
 
         [HttpPost]
         public async Task<ActionResult> Create(CreateProductDto dto)
@@ -69,7 +60,7 @@ namespace StorApp.Controllers
                 Amount = dto.Amount,
 
             };
-           await Service.AddAsync(product);
+           await Service.AddProductAsync(product);
 
             return CreatedAtRoute("GetProduct", new
             {
@@ -83,16 +74,19 @@ namespace StorApp.Controllers
         public async Task<ActionResult> UpdateProduct(UpdateProductDto dto, int productId)
         {
 
-            var product = await Service.GetByIdAsync(productId);
+            var product = await Service.GetProductAsync(productId);
             if (product == null)
-                return NotFound($"No genre was found with ID: {productId}");
+            {
+                logger.LogInformation($"The product with ID {productId} could not be found!");
+                return NotFound($"The product with ID {productId} could not be found!");
+            }
 
             product.Name = dto.Name;
             product.Description = dto.Description;
             product.Price = dto.Price;
             product.Amount = dto.Amount;
 
-            await Service.UpdateAsync(product);
+            await Service.UpdateProductAsync(product);
 
             return NoContent();
         }
@@ -102,11 +96,13 @@ namespace StorApp.Controllers
         public async Task<ActionResult> PartiallyUpdateProduct(JsonPatchDocument<UpdateProductDto> dto, int productId)
         {
 
-            var existingproduct = await Service.GetByIdAsync(productId);
+            var existingproduct = await Service.GetProductAsync(productId);
             if (existingproduct == null)
-                return NotFound($"No genre was found with ID: {productId}");
-
-            await Service.PartiallyUpdateAsync(dto, existingproduct);
+            {
+                logger.LogInformation($"The product with ID {productId} could not be found!");
+                return NotFound($"The product with ID {productId} could not be found!");
+            }
+            await Service.PartiallyUpdateProductAsync(dto, existingproduct);
             return NoContent();
         }
 
@@ -116,18 +112,14 @@ namespace StorApp.Controllers
         public async Task<ActionResult> DeleteProduct(int productId)
         {
 
-            var product =await Service.GetByIdAsync(productId);
+            var product =await Service.GetProductAsync(productId);
             if (product == null)
             {
-                var products = await Service.GetAllAsync();
-                product = products?.FirstOrDefault(); ;
-                if (product == null)
-                {
-                    return NotFound($"No genre was found with ID: {productId}");
-                }
+                logger.LogInformation($"The product with ID {productId} could not be found!");
+                return NotFound($"The product with ID {productId} could not be found!");
             }
             await Service.DeleteAsync(product);
-            mail.Send();
+            mail.Send(productId);
             return NoContent();
         }
 

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace StorApp.Controllers
 {
 
-    [Route("api/[controller]")]
+    [Route("api/Files")]
     [ApiController]
     public class FilesController : ControllerBase
     {
