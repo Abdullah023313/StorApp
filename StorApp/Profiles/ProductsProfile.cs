@@ -8,7 +8,11 @@ namespace StorApp.Profiles
     {
         public ProductsProfile()
         {
-            CreateMap<Product, ProductWithoutBrands>();
+            CreateMap<Product, ProductWithoutBrands>()
+                .ForMember(dest => dest.Price, source => source.MapFrom(
+                    s => s.Price != 0 ? (s.Price *1.12).ToString() : "Free"
+                    ));
+            CreateMap<Product, UpdateProductDto>();
         }
     }
 }

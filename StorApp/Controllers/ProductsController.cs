@@ -37,15 +37,14 @@ namespace StorApp.Controllers
                 logger.LogInformation($"The product with ID {productId} could not be found!");
                 return NotFound();
             }
-            return Ok(products);
+            return Ok(mapper.Map<ProductWithoutBrands>(products));
         }
 
         [HttpGet]
         public async Task<ActionResult> GetProducts()
         {
             var products = await Service.GetProductsAsync();
-            //return Ok(mapper.Map<List<ProductWithoutBrands>>(products));
-            return Ok((products));
+            return Ok(mapper.Map<List<ProductWithoutBrands>>(products));
 
         }
 
@@ -80,12 +79,8 @@ namespace StorApp.Controllers
                 logger.LogInformation($"The product with ID {productId} could not be found!");
                 return NotFound($"The product with ID {productId} could not be found!");
             }
-
-            product.Name = dto.Name;
-            product.Description = dto.Description;
-            product.Price = dto.Price;
-            product.Amount = dto.Amount;
-
+          
+            product=mapper.Map<Product>(dto);
             await Service.UpdateProductAsync(product);
 
             return NoContent();
@@ -112,7 +107,7 @@ namespace StorApp.Controllers
         public async Task<ActionResult> DeleteProduct(int productId)
         {
 
-            var product =await Service.GetProductAsync(productId);
+            var product = await Service.GetProductAsync(productId);
             if (product == null)
             {
                 logger.LogInformation($"The product with ID {productId} could not be found!");
@@ -122,7 +117,6 @@ namespace StorApp.Controllers
             mail.Send(productId);
             return NoContent();
         }
-
 
     }
 }

@@ -68,7 +68,9 @@ namespace StorApp.Services
         }
         public async Task DeleteAsync(Product product)
         {
-            context.Products.Remove(product);
+            //context.Products.Remove(product);
+            product.IsDeleted = true;
+            await UpdateProductAsync(product);
             await context.SaveChangesAsync();
         }
     }

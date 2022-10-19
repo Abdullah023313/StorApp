@@ -57,13 +57,13 @@ namespace StorApp.Controllers
 
 
         [HttpPost]
-        public async Task<ActionResult> Create(CreateBrandsDto dto, int ProductId)
+        public async Task<ActionResult> Create(CreateBrandsDto dto, int productId)
         {
             var brand = new Brand()
             {
                 Name = dto.Name,
                 Notes = dto.Notes,
-                ProductId = ProductId
+                ProductId = productId
             };
             await Service.AddBrandAsync(brand);
 
