@@ -9,7 +9,7 @@ namespace StorApp.Services
     {
         private readonly ILogger<ProductsRepository> logger;
         private readonly StorDbContext context;
-      
+
 
         public ProductsRepository(ILogger<ProductsRepository> logger, StorDbContext context)
         {
@@ -17,13 +17,13 @@ namespace StorApp.Services
             this.context = context;
 
         }
-        public async Task<(IList<Product>?,PaginationMetaData)> GetProductsAsync(int pageNumber, int pageSize,string? name, int? maxPrice,int minPrice = 0)
+        public async Task<(IList<Product>?, PaginationMetaData)> GetProductsAsync(int pageNumber, int pageSize, string? name, int? maxPrice, int minPrice = 0)
         {
             var totalProducts = await context.Products.CountAsync();
 
             var paginationMetaData = new PaginationMetaData(totalProducts, pageSize, pageNumber);
 
-            var query= context.Products as IQueryable<Product>;
+            var query = context.Products as IQueryable<Product>;
 
             if (!string.IsNullOrEmpty(name))
             {
@@ -32,19 +32,20 @@ namespace StorApp.Services
             }
 
             if (maxPrice != null)
-                query = query.Where(p => p.Price*1.12 <= maxPrice);
+                query = query.Where(p => p.Price * 1.12 <= maxPrice);
 
             if (minPrice > 0)
                 query = query.Where(p => p.Price * 1.12 >= minPrice);
 
             var filterProducts = await query
                 .OrderBy(p => p.Name)
-                .Skip(pageSize * (pageNumber -1))
+                .Skip(pageSize * (pageNumber - 1))
                 .Take(pageSize)
                 .ToListAsync();
 
             return (filterProducts, paginationMetaData);
         }
+      
 
         public async Task<Product?> GetProductAsync(int productId, bool includeBrands = false)
         {

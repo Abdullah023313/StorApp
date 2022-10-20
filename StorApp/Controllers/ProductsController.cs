@@ -109,8 +109,6 @@ namespace StorApp.Controllers
             return NoContent();
         }
 
-
-
         [HttpDelete("{productId}")]
         public async Task<ActionResult> DeleteProduct(int productId)
         {

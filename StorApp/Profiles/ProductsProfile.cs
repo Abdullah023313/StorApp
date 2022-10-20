@@ -14,6 +14,7 @@ namespace StorApp.Profiles
                     ))
                 .ForMember(dest=>dest.Name,source=>source.MapFrom(
                     source=>source.Name.ToUpper()));
+
             CreateMap<Product, UpdateProductDto>();
         }
     }
