@@ -17,7 +17,7 @@ namespace StorApp.Controllers
     [ApiController]
     [Authorize]
     //[Authorize(Policy="SuperAdmin")]
-    [Authorize(Roles = "SuperAdminstrator , Adminstrator ")]
+    //[Authorize(Roles = "SuperAdminstrator , Adminstrator ")]
     public class ProductsController : ControllerBase
     {
         private readonly ILogger<ProductsController> logger;
@@ -33,14 +33,8 @@ namespace StorApp.Controllers
             this.mapper = mapper;
             this.mail = mail;
         }
-
-        [HttpGet(template:"User")]
-        public ActionResult<string> GetUser()
-        {
-            var userName = User.Claims.FirstOrDefault(c => c.Type == "GivenName")?.Value;
-
-            return Ok();
-        }
+        CookieBuilder
+   
         [HttpGet(template: "AllBrands")]
         public async Task<ActionResult> GetBrands()
         {
@@ -66,6 +60,15 @@ namespace StorApp.Controllers
             return Ok(mapper.Map<ProductWithBrands>(products));
         }
 
+        /// <summary>
+        /// Get list of Products
+        /// </summary>
+        /// <param name="name">Search by product name</param>
+        /// <param name="maxPrice">Determine the highest price for the products</param>
+        /// <param name="minPrice">The lowest price for products, the default value is zero</param>
+        /// <param name="PageNumber">Page number, the default value is zero</param>
+        /// <param name="pageSize">Page size, the default value is ten</param>
+        /// <returns>List of products, maximum number of products {pageSize} </returns>
         [HttpGet]
         public async Task<ActionResult> GetProducts(string? name, int? maxPrice, int minPrice = 0, int PageNumber = 1, int pageSize = 10)
         {
@@ -74,6 +77,7 @@ namespace StorApp.Controllers
             var (products, paginationData) = await Service.GetProductsAsync(PageNumber, pageSize, name: name, maxPrice: maxPrice, minPrice);
 
             Response.Headers.Add("X-pagination", paginationData.ToString());
+   
 
             return Ok(mapper.Map<List<ProductWithoutBrands>>(products));
 
@@ -96,7 +100,6 @@ namespace StorApp.Controllers
             {
                 productId = product.ProductId
             }, product);
-
         }
 
 

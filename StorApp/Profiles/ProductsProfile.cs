@@ -23,7 +23,7 @@ namespace StorApp.Profiles
                     ))
                 .ForMember(dest => dest.Name, source => source.MapFrom(
                     s => s.Name.ToUpper()))
-                .ForMember(dest => dest.BrandsDto, source => source.MapFrom(
+                .ForMember(dest => dest.Brands, source => source.MapFrom(
                    s => s.Brands))
                   ;
 

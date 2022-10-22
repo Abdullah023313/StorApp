@@ -16,19 +16,18 @@ var configuration = new ConfigurationBuilder()
 
 Log.Logger = new LoggerConfiguration()
         .WriteTo.Console()
-        .WriteTo.File(@"D:\LogFiles\Log.txt",rollingInterval:RollingInterval.Day)
+        .WriteTo.File(@"D:\LogFiles\Log.txt", rollingInterval: RollingInterval.Day)
         .ReadFrom.Configuration(configuration)
         .CreateLogger();
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-//builder.Logging.ClearProviders();
-//builder.Logging.AddConsole();
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
 
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<StorDbContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<StorDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
 builder.Services.AddControllers(Options =>
@@ -42,12 +41,35 @@ builder.Services.AddControllers(Options =>
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "StorApp.xml"));
+    options.AddSecurityDefinition("StorAuthentication", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        Description = "Enter a valid JWT token"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement{
+    {
+        new OpenApiSecurityScheme {
+            Reference = new OpenApiReference {
+                Type = ReferenceType.SecurityScheme,
+                Id = "StorAuthentication"
+            } },
+        new List<string>()
+    }});
+});
+
+
 
 builder.Host.UseSerilog();
 
 builder.Services.AddAuthentication("Bearer").AddJwtBearer(
-    options => {
+    options =>
+    {
         options.TokenValidationParameters = new()
         {
             ValidateIssuerSigningKey = true,
@@ -61,18 +83,14 @@ builder.Services.AddAuthentication("Bearer").AddJwtBearer(
     }
     );
 
-builder.Services.AddAuthorization(options => {
-    options.AddPolicy("SuperAdmin",policy =>
-    {
-        policy.RequireAuthenticatedUser();
-        policy.RequireRole("");
-        policy.RequireClaim("", "");
-    });
-});
-
-//builder.Services.AddSwaggerGen(c =>
+//builder.Services.AddAuthorization(options =>
 //{
-//    c.SwaggerDoc("v1", new OpenApiInfo { Title = "TestApiJWT", Version = "v1" });
+//    options.AddPolicy("SuperAdmin", policy =>
+//    {
+//        policy.RequireAuthenticatedUser();
+//        policy.RequireRole("");
+//        policy.RequireClaim("", "");
+//    });
 //});
 
 
@@ -87,6 +105,15 @@ builder.Services.AddTransient<IMailServices, StorMailServices>();
 #endif
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+builder.Services.AddApiVersioning(options =>
+{
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
+    options.ReportApiVersions = true;
+});
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -98,7 +125,8 @@ if (app.Environment.IsDevelopment())
 app.UseCors(x => x.AllowAnyMethod()
                   .AllowAnyHeader()
                   .SetIsOriginAllowed(origin => true) // allow any origin
-                  .AllowCredentials()); // allow credentials
+                  .AllowCredentials()// allow credentials
+                  );
 
 app.UseHttpsRedirection();
 

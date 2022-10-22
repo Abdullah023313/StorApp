@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>StorApp</name>
+    </assembly>
+    <members>
+        <member name="M:StorApp.Controllers.ProductsController.GetProducts(System.String,System.Nullable{System.Int32},System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Get list of Products
+            </summary>
+            <param name="name">Search by product name</param>
+            <param name="maxPrice">Determine the highest price for the products</param>
+            <param name="minPrice">The lowest price for products, the default value is zero</param>
+            <param name="PageNumber">Page number, the default value is zero</param>
+            <param name="pageSize">Page size, the default value is ten</param>
+            <returns>List of products, maximum number of products {pageSize} </returns>
+        </member>
+    </members>
+</doc>

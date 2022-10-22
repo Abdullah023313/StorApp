@@ -9,9 +9,10 @@ using System.Text;
 
 namespace StorApp.Controllers
 {
-    [Route("api/Authentication")]
+    [Route("api/v{version:apiVersion}/Authentication")]
     [ApiController]
-  
+    [ApiVersion("2.0")]
+ 
     public class AuthenticationController : ControllerBase
     {
         private readonly IConfiguration configuration;
