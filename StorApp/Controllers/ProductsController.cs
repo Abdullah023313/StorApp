@@ -33,7 +33,7 @@ namespace StorApp.Controllers
             this.mapper = mapper;
             this.mail = mail;
         }
-        CookieBuilder
+
    
         [HttpGet(template: "AllBrands")]
         public async Task<ActionResult> GetBrands()
