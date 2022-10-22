@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,9 @@ namespace StorApp.Controllers
 {
     [Route("api/Products")]
     [ApiController]
-
+    [Authorize]
+    //[Authorize(Policy="SuperAdmin")]
+    [Authorize(Roles = "SuperAdminstrator , Adminstrator ")]
     public class ProductsController : ControllerBase
     {
         private readonly ILogger<ProductsController> logger;
@@ -23,12 +26,20 @@ namespace StorApp.Controllers
         private readonly IMailServices mail;
         private readonly int maxPageSize = 50;
 
-        public ProductsController(ILogger<ProductsController> logger, IProductsRepository Service , IMapper mapper , IMailServices mail)
+        public ProductsController(ILogger<ProductsController> logger, IProductsRepository Service, IMapper mapper, IMailServices mail)
         {
             this.logger = logger;
             this.Service = Service;
             this.mapper = mapper;
             this.mail = mail;
+        }
+
+        [HttpGet(template:"User")]
+        public ActionResult<string> GetUser()
+        {
+            var userName = User.Claims.FirstOrDefault(c => c.Type == "GivenName")?.Value;
+
+            return Ok();
         }
         [HttpGet(template: "AllBrands")]
         public async Task<ActionResult> GetBrands()
@@ -46,7 +57,7 @@ namespace StorApp.Controllers
         [HttpGet("{productId}", Name = "GetProduct")]
         public async Task<ActionResult> GetProduct(int productId)
         {
-            var products = await Service.GetProductAsync(productId,true);
+            var products = await Service.GetProductAsync(productId, true);
             if (products == null)
             {
                 logger.LogInformation($"The product with ID {productId} could not be found!");
@@ -56,11 +67,11 @@ namespace StorApp.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> GetProducts(string? name, int? maxPrice, int minPrice = 0,int PageNumber=1, int pageSize = 10)
+        public async Task<ActionResult> GetProducts(string? name, int? maxPrice, int minPrice = 0, int PageNumber = 1, int pageSize = 10)
         {
             pageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
-            var (products, paginationData) = await Service.GetProductsAsync(PageNumber, pageSize, name:name, maxPrice:maxPrice,minPrice);
+            var (products, paginationData) = await Service.GetProductsAsync(PageNumber, pageSize, name: name, maxPrice: maxPrice, minPrice);
 
             Response.Headers.Add("X-pagination", paginationData.ToString());
 
@@ -79,7 +90,7 @@ namespace StorApp.Controllers
                 Amount = dto.Amount,
 
             };
-           await Service.AddProductAsync(product);
+            await Service.AddProductAsync(product);
 
             return CreatedAtRoute("GetProduct", new
             {
@@ -99,12 +110,12 @@ namespace StorApp.Controllers
                 logger.LogInformation($"The product with ID {productId} could not be found!");
                 return NotFound($"The product with ID {productId} could not be found!");
             }
-          
-            product.Name=dto.Name;
-            product.Description=dto.Description;
-            product.Price=dto.Price;
-            product.Amount=dto.Amount;
-            
+
+            product.Name = dto.Name;
+            product.Description = dto.Description;
+            product.Price = dto.Price;
+            product.Amount = dto.Amount;
+
             await Service.UpdateProductAsync(product);
 
             return NoContent();

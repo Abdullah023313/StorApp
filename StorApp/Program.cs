@@ -47,26 +47,34 @@ builder.Services.AddSwaggerGen();
 builder.Host.UseSerilog();
 
 builder.Services.AddAuthentication("Bearer").AddJwtBearer(
-    options =>
-    {
-        options.TokenValidationParameters = new ()
+    options => {
+        options.TokenValidationParameters = new()
         {
             ValidateIssuerSigningKey = true,
             ValidateIssuer = true,
             ValidateAudience = true,
-            ValidateLifetime = true,
             ValidIssuer = builder.Configuration["Authentication:Issuer"],
             ValidAudience = builder.Configuration["Authentication:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]))
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Authentication:Secret"]))
         };
+        options.Validate();
+    }
+    );
+
+builder.Services.AddAuthorization(options => {
+    options.AddPolicy("SuperAdmin",policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireRole("");
+        policy.RequireClaim("", "");
     });
-
-
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "TestApiJWT", Version = "v1" });
 });
-       
+
+//builder.Services.AddSwaggerGen(c =>
+//{
+//    c.SwaggerDoc("v1", new OpenApiInfo { Title = "TestApiJWT", Version = "v1" });
+//});
+
 
 
 builder.Services.AddScoped<IBrandRepository, BrandRepository>();
