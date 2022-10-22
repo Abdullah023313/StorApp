@@ -26,38 +26,31 @@ namespace StorApp.Controllers
 
         }
 
+      
         [HttpGet]
         public async Task<ActionResult> GetBrands(int productId)
         {
-            IList<Brand>? brands;
-            if (productId > 0)
-            {
-                 brands = await Service.GetBrandsForProductAsync(productId);
-            }
-            else
-            {
-                 brands = await Service.GetBrandsAsync();
-            }             
+            var brands = await Service.GetBrandsForProductAsync(productId);
             if (brands == null)
             {
                 logger.LogInformation($"There are no product {productId} brands!");
                 return NotFound($"The brand with ID {productId} could not be found!");
             }
-            return Ok(brands);
-
+            return Ok(mapper.Map<List<BrandDto>>(brands));
         }
+
 
 
         [HttpGet("{brandId}", Name = "GetBrand")]
         public async Task<ActionResult> GetBrand(int productId, int brandId)
         {
             var brand = await Service.GetBrandForProductAsync(productId, brandId);
-            return Ok(brand);
+            return Ok(mapper.Map<BrandDto>(brand));
         }
 
 
         [HttpPost]
-        public async Task<ActionResult> Create(CreateBrandsDto dto, int productId)
+        public async Task<ActionResult> Create(BrandDto dto, int productId)
         {
             var brand = new Brand()
             {
@@ -77,7 +70,7 @@ namespace StorApp.Controllers
 
 
         [HttpPut("{brandId}")]
-        public async Task<ActionResult> UpdateBrand(UpdateBrandDto dto, int productId, int brandId)
+        public async Task<ActionResult> UpdateBrand(BrandDto dto, int productId, int brandId)
         {
 
             var brand = await Service.GetBrandForProductAsync(productId, brandId);
@@ -98,7 +91,7 @@ namespace StorApp.Controllers
 
 
         [HttpPatch("{brandId}")]
-        public async Task<ActionResult> PartiallyUpdateBrand(JsonPatchDocument<UpdateBrandDto> dto, int productId, int brandId)
+        public async Task<ActionResult> PartiallyUpdateBrand(JsonPatchDocument<BrandDto> dto, int productId, int brandId)
         {
 
             var existingbrand = await Service.GetBrandForProductAsync(productId, brandId);

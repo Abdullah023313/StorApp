@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using StorApp.Dtos;
 using StorApp.Model;
+using StorApp.Model.Dtos;
 using StorApp.Services;
 using StorApp.Services.StorApi.Services;
 using System.Drawing.Printing;
@@ -29,18 +30,29 @@ namespace StorApp.Controllers
             this.mapper = mapper;
             this.mail = mail;
         }
+        [HttpGet(template: "AllBrands")]
+        public async Task<ActionResult> GetBrands()
+        {
+            var brands = await Service.GetBrandsAsync();
+            if (brands == null)
+            {
+                logger.LogInformation($"NULL!");
+                return NotFound($"NULL");
+            }
+            return Ok(brands);
+        }
 
 
         [HttpGet("{productId}", Name = "GetProduct")]
         public async Task<ActionResult> GetProduct(int productId)
         {
-            var products = await Service.GetProductAsync(productId);
+            var products = await Service.GetProductAsync(productId,true);
             if (products == null)
             {
                 logger.LogInformation($"The product with ID {productId} could not be found!");
                 return NotFound();
             }
-            return Ok(mapper.Map<ProductWithoutBrands>(products));
+            return Ok(mapper.Map<ProductWithBrands>(products));
         }
 
         [HttpGet]
@@ -57,7 +69,7 @@ namespace StorApp.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Create(CreateProductDto dto)
+        public async Task<ActionResult> Create(ProductDto dto)
         {
             var product = new Product()
             {
@@ -78,7 +90,7 @@ namespace StorApp.Controllers
 
 
         [HttpPut("{productId}")]
-        public async Task<ActionResult> UpdateProduct(UpdateProductDto dto, int productId)
+        public async Task<ActionResult> UpdateProduct(ProductDto dto, int productId)
         {
 
             var product = await Service.GetProductAsync(productId);
@@ -88,7 +100,11 @@ namespace StorApp.Controllers
                 return NotFound($"The product with ID {productId} could not be found!");
             }
           
-            product=mapper.Map<Product>(dto);
+            product.Name=dto.Name;
+            product.Description=dto.Description;
+            product.Price=dto.Price;
+            product.Amount=dto.Amount;
+            
             await Service.UpdateProductAsync(product);
 
             return NoContent();
@@ -96,7 +112,7 @@ namespace StorApp.Controllers
 
 
         [HttpPatch("{productId}")]
-        public async Task<ActionResult> PartiallyUpdateProduct(JsonPatchDocument<UpdateProductDto> dto, int productId)
+        public async Task<ActionResult> PartiallyUpdateProduct(JsonPatchDocument<ProductDto> dto, int productId)
         {
 
             var existingproduct = await Service.GetProductAsync(productId);

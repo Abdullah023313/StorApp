@@ -17,6 +17,11 @@ namespace StorApp.Services
             this.context = context;
 
         }
+        public async Task<IList<Brand>?> GetBrandsAsync()
+        {
+            return await context.Products.SelectMany(p => p.Brands).Distinct().ToListAsync();
+        }
+
         public async Task<(IList<Product>?, PaginationMetaData)> GetProductsAsync(int pageNumber, int pageSize, string? name, int? maxPrice, int minPrice = 0)
         {
             var totalProducts = await context.Products.CountAsync();
@@ -73,13 +78,13 @@ namespace StorApp.Services
             await context.SaveChangesAsync();
         }
 
-        public async Task PartiallyUpdateProductAsync(JsonPatchDocument<UpdateProductDto> dto, Product product)
+        public async Task PartiallyUpdateProductAsync(JsonPatchDocument<ProductDto> dto, Product product)
         {
-            var productToPatch = new UpdateProductDto()
+            var productToPatch = new ProductDto()
             {
                 Name = product.Name,
                 Description = product.Description,
-                Price = product.Price,
+                //Price = product.Price,
                 Amount = product.Amount
             };
 
@@ -87,7 +92,7 @@ namespace StorApp.Services
 
             product.Name = productToPatch.Name;
             product.Description = productToPatch.Description;
-            product.Price = productToPatch.Price;
+            //product.Price = productToPatch.Price;
 
             context.Products.Update(product);
             await context.SaveChangesAsync();

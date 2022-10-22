@@ -4,9 +4,11 @@ using Serilog.Sinks.MSSqlServer;
 using StorApp.Model;
 using StorApp.Services;
 using StorApp.Services.StorApi.Services;
-
-
-
+using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
@@ -44,6 +46,29 @@ builder.Services.AddSwaggerGen();
 
 builder.Host.UseSerilog();
 
+builder.Services.AddAuthentication("Bearer").AddJwtBearer(
+    options =>
+    {
+        options.TokenValidationParameters = new ()
+        {
+            ValidateIssuerSigningKey = true,
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidIssuer = builder.Configuration["Authentication:Issuer"],
+            ValidAudience = builder.Configuration["Authentication:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]))
+        };
+    });
+
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "TestApiJWT", Version = "v1" });
+});
+       
+
+
 builder.Services.AddScoped<IBrandRepository, BrandRepository>();
 builder.Services.AddScoped<IProductsRepository, ProductsRepository>();
 
@@ -68,6 +93,8 @@ app.UseCors(x => x.AllowAnyMethod()
                   .AllowCredentials()); // allow credentials
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

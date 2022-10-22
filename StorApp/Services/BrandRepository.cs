@@ -18,10 +18,7 @@ namespace StorApp.Services
             this.context = context;
 
         }
-        public async Task<IList<Brand>?> GetBrandsAsync()
-        {
-            return await context.Products.SelectMany(p => p.Brands).Distinct().ToListAsync();
-        }
+     
 
         public async Task<IList<Brand>?> GetBrandsForProductAsync(int productId)
         {
@@ -48,9 +45,9 @@ namespace StorApp.Services
             await context.SaveChangesAsync();
         }
 
-        public async Task PartiallyUpdateBrandAsync(JsonPatchDocument<UpdateBrandDto> dto, Brand brand)
+        public async Task PartiallyUpdateBrandAsync(JsonPatchDocument<BrandDto> dto, Brand brand)
         {
-            var brandToPatch = new UpdateBrandDto()
+            var brandToPatch = new BrandDto()
             {
                 Name = brand.Name,
                 Notes=brand.Notes
