@@ -4,6 +4,13 @@
         <name>StorApp</name>
     </assembly>
     <members>
+        <member name="M:StorApp.Controllers.AuthenticationController.RegisterAsync(StorApp.Model.UserRegister)">
+            <summary>
+             
+            </summary>
+            <param name="user">is Class Include UserName and Password</param>
+            <returns>return myToken</returns>
+        </member>
         <member name="M:StorApp.Controllers.ProductsController.GetProducts(System.String,System.Nullable{System.Int32},System.Int32,System.Int32,System.Int32)">
             <summary>
             Get list of Products

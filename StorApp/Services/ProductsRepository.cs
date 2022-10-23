@@ -84,7 +84,7 @@ namespace StorApp.Services
             {
                 Name = product.Name,
                 Description = product.Description,
-                //Price = product.Price,
+                Price = product.Price,
                 Amount = product.Amount
             };
 
@@ -92,7 +92,7 @@ namespace StorApp.Services
 
             product.Name = productToPatch.Name;
             product.Description = productToPatch.Description;
-            //product.Price = productToPatch.Price;
+            product.Price = productToPatch.Price;
 
             context.Products.Update(product);
             await context.SaveChangesAsync();

@@ -1,4 +1,6 @@
-﻿namespace StorApp.Model
+﻿using System.Reflection.Metadata.Ecma335;
+
+namespace StorApp.Model
 {
     public class Product
     {
@@ -7,8 +9,9 @@
         public string Description { get; set; } = null!;
         public int Price { get; set; }
         public int Amount { get; set; }
-        public bool IsDeleted { get; set; }= false!;
+        public bool IsDeleted { get; set; }= false!;       
         public List<Brand> Brands { get; set; } = new List<Brand>();
 
     }
+   
 }

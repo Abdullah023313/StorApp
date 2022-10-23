@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using StorApp.Model;
 using StorApp.Services.StorApi.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -22,9 +23,17 @@ namespace StorApp.Controllers
             this.configuration = configuration;
         }
         /*[FromQuery] string FName, [FromRoute] string LName, int age ,[FromHeader] string Password ,[FromForm] string city , [FromServices] IMailServices mailServices*/
-        [HttpGet]
-        public ActionResult RegisterAsync()
+
+        /// <summary>
+        ///  
+        /// </summary>
+        /// <param name="user">is Class Include UserName and Password</param>
+        /// <returns>return myToken</returns>
+        [HttpPost]
+        public ActionResult RegisterAsync([FromForm] UserRegister user)
         {
+            if (user == null)
+                return Unauthorized();
 
             var claims = new List<Claim>()
             {

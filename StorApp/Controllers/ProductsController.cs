@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Server.IIS.Core;
 using StorApp.Dtos;
+using StorApp.Extensions;
 using StorApp.Model;
 using StorApp.Model.Dtos;
 using StorApp.Services;
@@ -15,7 +17,7 @@ namespace StorApp.Controllers
 {
     [Route("api/Products")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     //[Authorize(Policy="SuperAdmin")]
     //[Authorize(Roles = "SuperAdminstrator , Adminstrator ")]
     public class ProductsController : ControllerBase
@@ -41,8 +43,8 @@ namespace StorApp.Controllers
             var brands = await Service.GetBrandsAsync();
             if (brands == null)
             {
-                logger.LogInformation($"NULL!");
                 return NotFound($"NULL");
+                logger.LogInformation("Not Found brands ", "NullReferenceException");
             }
             return Ok(brands);
         }
@@ -54,7 +56,7 @@ namespace StorApp.Controllers
             var products = await Service.GetProductAsync(productId, true);
             if (products == null)
             {
-                logger.LogInformation($"The product with ID {productId} could not be found!");
+                logger.myLogInformation($"The product with ID {productId} could not be found! ", new NullReferenceException());
                 return NotFound();
             }
             return Ok(mapper.Map<ProductWithBrands>(products));
