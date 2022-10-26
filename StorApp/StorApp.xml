@@ -4,12 +4,12 @@
         <name>StorApp</name>
     </assembly>
     <members>
-        <member name="M:StorApp.Controllers.AuthenticationController.RegisterAsync(StorApp.Model.UserRegister)">
+        <member name="M:StorApp.Controllers.AuthenticationController.RegisterAsync(StorApp.Model.Dtos.Register)">
             <summary>
              
             </summary>
-            <param name="user">is Class Include UserName and Password</param>
-            <returns>return myToken</returns>
+            <param name="model">is model Include Email , Password and ConfirmPassword</param>
+            <returns>return UserManagerResponse</returns>
         </member>
         <member name="M:StorApp.Controllers.ProductsController.GetProducts(System.String,System.Nullable{System.Int32},System.Int32,System.Int32,System.Int32)">
             <summary>
@@ -21,6 +21,15 @@
             <param name="PageNumber">Page number, the default value is zero</param>
             <param name="pageSize">Page size, the default value is ten</param>
             <returns>List of products, maximum number of products {pageSize} </returns>
+        </member>
+        <member name="M:StorApp.Services.IMailService.SendEmailAsync(System.String,System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="toEmail"></param>
+            <param name="subject"></param>
+            <param name="content"></param>
+            <returns></returns>
         </member>
     </members>
 </doc>

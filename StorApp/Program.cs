@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
 
 var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
@@ -63,43 +64,55 @@ builder.Services.AddSwaggerGen(options =>
     }});
 });
 
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequiredLength = 5;
+}).AddEntityFrameworkStores<StorDbContext>()
+               .AddDefaultTokenProviders();
+
 
 
 builder.Host.UseSerilog();
 
-builder.Services.AddAuthentication("Bearer").AddJwtBearer(
-    options =>
+builder.Services.AddAuthentication("Bearer").AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new()
     {
-        options.TokenValidationParameters = new()
-        {
-            ValidateIssuerSigningKey = true,
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidIssuer = builder.Configuration["Authentication:Issuer"],
-            ValidAudience = builder.Configuration["Authentication:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Authentication:Secret"]))
-        };
-        options.Validate();
-    }
-    );
+        ValidateIssuerSigningKey = true,
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidIssuer = builder.Configuration["Authentication:Issuer"],
+        ValidAudience = builder.Configuration["Authentication:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Authentication:Secret"]))
+    };
+    options.Validate();
+});
 
-//builder.Services.AddAuthorization(options =>
-//{
-//    options.AddPolicy("SuperAdmin", policy =>
-//    {
-//        policy.RequireAuthenticatedUser();
-//        policy.RequireRole("");
-//        policy.RequireClaim("", "");
-//    });
-//});
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("SuperAdmin", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireRole("");
+        policy.RequireClaim("", "");
+    });
+});
 
 
 
 builder.Services.AddScoped<IBrandRepository, BrandRepository>();
+
 builder.Services.AddScoped<IProductsRepository, ProductsRepository>();
 
+builder.Services.AddScoped<IUserService, UserService>();
+
+builder.Services.AddScoped<settings>();
+
 #if DEBUG
-builder.Services.AddTransient<IMailServices, MockMailServises>();
+builder.Services.AddTransient<IMailService, MockMailServises>();
 #else
 builder.Services.AddTransient<IMailServices, StorMailServices>();
 #endif
@@ -122,11 +135,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseCors(x => x.AllowAnyMethod()
-                  .AllowAnyHeader()
-                  .SetIsOriginAllowed(origin => true) // allow any origin
-                  .AllowCredentials()// allow credentials
-                  );
+
+app.UseCors(x =>x.AllowAnyMethod() 
+.AllowAnyHeader()
+.SetIsOriginAllowed(origin => true)
+.AllowCredentials() 
+);
 
 app.UseHttpsRedirection();
 

@@ -25,15 +25,13 @@ namespace StorApp.Controllers
         private readonly ILogger<ProductsController> logger;
         private readonly IProductsRepository Service;
         private readonly IMapper mapper;
-        private readonly IMailServices mail;
         private readonly int maxPageSize = 50;
 
-        public ProductsController(ILogger<ProductsController> logger, IProductsRepository Service, IMapper mapper, IMailServices mail)
+        public ProductsController(ILogger<ProductsController> logger, IProductsRepository Service, IMapper mapper)
         {
             this.logger = logger;
             this.Service = Service;
             this.mapper = mapper;
-            this.mail = mail;
         }
 
    
@@ -152,7 +150,6 @@ namespace StorApp.Controllers
                 return NotFound($"The product with ID {productId} could not be found!");
             }
             await Service.DeleteAsync(product);
-            mail.Send(productId);
             return NoContent();
         }
 

@@ -3,7 +3,7 @@ using StorApp.Services.StorApi.Services;
 
 namespace StorApp.Services
 {
-    public class MockMailServises : IMailServices
+    public class MockMailServises : IMailService
     {
         private readonly ILogger<MockMailServises> logger;
         private string mailTo = string.Empty;
@@ -15,11 +15,11 @@ namespace StorApp.Services
             mailFrom = configuration["mailStrings:mailFrom"];
             this.logger = logger;
         }
-        public void Send(int productId)
-        {
 
-            logger.LogInformation($"The product {productId} has been deleted");
-            logger.LogInformation($"The message was sent from {mailFrom} to {mailTo}");
+        public async Task SendEmailAsync(string toEmail, string subject, string content)
+        {
+            logger.LogInformation($"The message was sent from {mailFrom} to {toEmail}");
         }
+
     }
 }

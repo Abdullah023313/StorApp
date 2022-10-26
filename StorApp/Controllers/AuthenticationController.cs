@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AspNetIdentityDemo.Shared;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using StorApp.Model;
+using StorApp.Model.Dtos;
+using StorApp.Services;
 using StorApp.Services.StorApi.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -16,44 +19,31 @@ namespace StorApp.Controllers
  
     public class AuthenticationController : ControllerBase
     {
-        private readonly IConfiguration configuration;
+        private readonly IConfiguration _configuration;
+        private readonly IUserService _userService;
+        private readonly IMailService _mailService;
 
-        public AuthenticationController(IConfiguration configuration)
+        public AuthenticationController(IUserService userService, IMailService mailService, IConfiguration configuration)
         {
-            this.configuration = configuration;
+            _userService = userService;
+            _mailService = mailService;
+            _configuration = configuration;
         }
-        /*[FromQuery] string FName, [FromRoute] string LName, int age ,[FromHeader] string Password ,[FromForm] string city , [FromServices] IMailServices mailServices*/
 
         /// <summary>
         ///  
         /// </summary>
-        /// <param name="user">is Class Include UserName and Password</param>
-        /// <returns>return myToken</returns>
-        [HttpPost]
-        public ActionResult RegisterAsync([FromForm] UserRegister user)
+        /// <param name="model">is model Include Email , Password and ConfirmPassword</param>
+        /// <returns>return UserManagerResponse</returns>
+        [HttpPost("Register")]
+        public async Task<IActionResult> RegisterAsync([FromBody] Register model)
         {
-            if (user == null)
-                return Unauthorized();
+                var result = await _userService.RegisterUserAsync(model);
 
-            var claims = new List<Claim>()
-            {
-                new Claim("Sub","1"),
-                new Claim("GivenName","Abdullah"),
-            };
+                if (result.IsSuccess)
+                    return Ok(result); 
 
-            var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration["Authentication:Secret"]));
-            var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
-
-            var jwtSecurityToken = new JwtSecurityToken(
-                issuer: configuration["Authentication:Issuer"],
-                audience: configuration["Authentication:Audience"],
-                claims: claims,
-                notBefore: DateTime.UtcNow,
-                expires: DateTime.UtcNow.AddHours(double.Parse(configuration["Authentication:DurationInHours"])),
-                signingCredentials: signingCredentials);
-
-            var myToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
-            return Ok(myToken);
-        } 
+                return BadRequest(result);
+        }
     }
 }

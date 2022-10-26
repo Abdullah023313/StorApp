@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace StorApp.Model
 {
-    public class StorDbContext : DbContext
+    public class StorDbContext : IdentityDbContext
     {
 
         public StorDbContext(DbContextOptions<StorDbContext> options) : base(options)
@@ -24,6 +25,7 @@ namespace StorApp.Model
         {
             modelBuilder.Entity<Product>()
                 .HasQueryFilter(p => !p.IsDeleted);
+            base.OnModelCreating(modelBuilder);
         }
     }
 }
