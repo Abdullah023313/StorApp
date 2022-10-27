@@ -1,13 +1,12 @@
 ﻿namespace StorApp.Services
 {
-    public class settings
+    public class Settings
     {
         
 
-        public settings( IConfiguration configuration)
+        public Settings( IConfiguration configuration)
         {
-            mailTo = configuration["mailStrings:mailTo"];
-            mailFrom = configuration["mailStrings:mailFrom"];
+            Email = configuration["mailStrings:Email"];
             Issuer = configuration["Authentication:Issuer"] ;
             Secret= configuration["Authentication:Secret"];
             Audience = configuration["Authentication:Audience"];
@@ -19,8 +18,7 @@
         public string Audience { get; set; }
         public string Secret { get; set; }
         public DateTime expires { get; set; }
-        public string mailTo { get; set; }
-        public string mailFrom { get; set; }
+        public string Email { get; set; }
         public string DefaultConnection { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace StorApp.Model.Dtos
+namespace StorApp.Model.UserManager
 {
     public class Register
     {

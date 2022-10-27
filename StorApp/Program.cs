@@ -87,19 +87,18 @@ builder.Services.AddAuthentication("Bearer").AddJwtBearer(options =>
         ValidAudience = builder.Configuration["Authentication:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Authentication:Secret"]))
     };
-    options.Validate();
 });
 
 
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("SuperAdmin", policy =>
-    {
-        policy.RequireAuthenticatedUser();
-        policy.RequireRole("");
-        policy.RequireClaim("", "");
-    });
-});
+//builder.Services.AddAuthorization(options =>
+//{
+//    options.AddPolicy("SuperAdmin", policy =>
+//    {
+//        policy.RequireAuthenticatedUser();
+//        policy.RequireRole("");
+//        policy.RequireClaim("", "");
+//    });
+//});
 
 
 
@@ -109,12 +108,12 @@ builder.Services.AddScoped<IProductsRepository, ProductsRepository>();
 
 builder.Services.AddScoped<IUserService, UserService>();
 
-builder.Services.AddScoped<settings>();
+builder.Services.AddScoped<Settings>();
 
 #if DEBUG
 builder.Services.AddTransient<IMailService, MockMailServises>();
 #else
-builder.Services.AddTransient<IMailServices, StorMailServices>();
+builder.Services.AddTransient<IMailService, MailServices>();
 #endif
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

@@ -1,20 +1,36 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using StorApp.Model.UserManager;
+using StorApp.Services;
 
 namespace StorApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class UserController : ControllerBase
     {
-        [HttpGet]
-        public ActionResult<string> GetUser()
-        {
-            var userName = User.Claims.FirstOrDefault(c => c.Type == "GivenName")?.Value;
+        private readonly IUserService _userService;
 
-            return Ok(userName??"NALL");
+        public UserController(IUserService userService)
+        {
+            _userService = userService;
         }
+
+
+            
+        [HttpGet]
+        public async Task<ActionResult> GetUsers()
+        {
+            var users = await _userService.GetUsers();
+
+            if (users == null)
+                return BadRequest(); 
+
+            return Ok(users);
+        }
+
     }
 }

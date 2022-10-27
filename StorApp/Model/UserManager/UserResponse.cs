@@ -1,4 +1,4 @@
-﻿namespace StorApp.Model.Dtos
+﻿namespace StorApp.Model.UserManager
 {
     public class UserResponse
     {
@@ -6,7 +6,7 @@
         public bool IsSuccess { get; set; }
         public List<string> Errors { get; set; }
         public string Token { get; set; }=string.Empty;
-        public string? ExpireDate { get; set; }
+        public DateTime? ExpireDate { get; set; }
     }
 }
 

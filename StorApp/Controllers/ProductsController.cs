@@ -54,7 +54,7 @@ namespace StorApp.Controllers
             var products = await Service.GetProductAsync(productId, true);
             if (products == null)
             {
-                logger.myLogInformation($"The product with ID {productId} could not be found! ", new NullReferenceException());
+                logger.LogInformation($"The product with ID {productId} could not be found! ");
                 return NotFound();
             }
             return Ok(mapper.Map<ProductWithBrands>(products));

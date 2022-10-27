@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace AspNetIdentityDemo.Shared
+namespace StorApp.Model.UserManager
 {
     public class Login
     {
@@ -17,4 +17,5 @@ namespace AspNetIdentityDemo.Shared
         public string Password { get; set; }
 
     }
+
 }

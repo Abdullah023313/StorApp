@@ -4,12 +4,19 @@
         <name>StorApp</name>
     </assembly>
     <members>
-        <member name="M:StorApp.Controllers.AuthenticationController.RegisterAsync(StorApp.Model.Dtos.Register)">
+        <member name="M:StorApp.Controllers.AuthenticationController.LoginAsync(StorApp.Model.UserManager.Login)">
+            <summary>
+            
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:StorApp.Controllers.AuthenticationController.RegisterAsync(StorApp.Model.UserManager.Register)">
             <summary>
              
             </summary>
             <param name="model">is model Include Email , Password and ConfirmPassword</param>
-            <returns>return UserManagerResponse</returns>
+            <returns>return UserResponse</returns>
         </member>
         <member name="M:StorApp.Controllers.ProductsController.GetProducts(System.String,System.Nullable{System.Int32},System.Int32,System.Int32,System.Int32)">
             <summary>
