@@ -19,18 +19,48 @@ namespace StorApp.Controllers
             _userService = userService;
         }
 
-
-            
-        [HttpGet]
-        public async Task<ActionResult> GetUsers()
+        [HttpPost("AddRole")]
+        public async Task<ActionResult> AddRole(string rolename)
         {
-            var users = await _userService.GetUsers();
+            if (string.IsNullOrEmpty(rolename))
+                return NotFound();
+            var result = await _userService.addRole(rolename);
 
-            if (users == null)
-                return BadRequest(); 
+            if (result.IsSuccess)
+                return Ok(result); // 200
 
-            return Ok(users);
+            return BadRequest(result); // 400
         }
 
+        [HttpPut("updateRole")]
+        public async Task<ActionResult> updateRole(string oldRolename, string newRolename)
+        {
+            if (string.IsNullOrEmpty(oldRolename))
+                return NotFound();
+
+            if (string.IsNullOrEmpty(newRolename))
+                return NotFound();
+
+            var result = await _userService.updateRole(oldRolename, newRolename);
+
+            if (result.IsSuccess)
+                return Ok(result); // 200
+
+            return BadRequest(result); // 400
+        }
+
+
+        [HttpPost("addRoleToUser")]
+        public async Task<ActionResult> addRoleToUser(string email, string rolename)
+        {
+            if (string.IsNullOrEmpty(rolename))
+                return NotFound();
+            var result = await _userService.addRoleToUser(email, rolename);
+
+            if (result.IsSuccess)
+                return Ok(result); // 200
+
+            return BadRequest(result); // 400
+        }
     }
 }

@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using MailKit.Net.Smtp;
+using MailKit.Security;
+using Microsoft.Extensions.Configuration;
+using MimeKit;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using System;
@@ -15,22 +18,57 @@ namespace StorApp.Services
         {
             private readonly ILogger<MailServices> _logger;
             private readonly Settings _settings;
-            public MailServices(ILogger<MailServices> logger,Settings settings)
+            public MailServices(ILogger<MailServices> logger, Settings settings)
             {
-                
+
                 _logger = logger;
                 _settings = settings;
             }
 
-            public async Task SendEmailAsync(string toEmail, string subject, string content)
+            public async Task SendEmailAsync(string mailTo, string subject, string body, string displayName, IList<IFormFile> attachments = null)
             {
-                //ToDo:
-                var client = new SendGridClient(_settings.Secret);
-                var from = new EmailAddress(_settings.Email, "JWT Auth Demo");
-                var to = new EmailAddress(toEmail);
-                var msg = MailHelper.CreateSingleEmail(from, to, subject, content, content);
-                var response = await client.SendEmailAsync(msg);
-                _logger.LogInformation($"The message was sent from {_settings.Email} to {toEmail}");
+                try
+                {
+                    var email = new MimeMessage
+                    {
+                        Sender = MailboxAddress.Parse(_settings.Email),
+                        Subject = subject
+                    };
+
+                    email.To.Add(MailboxAddress.Parse(mailTo));
+
+                    var builder = new BodyBuilder();
+
+                    if (attachments != null)
+                    {
+                        byte[] fileBytes;
+                        foreach (var file in attachments)
+                        {
+                            if (file.Length > 0)
+                            {
+                                using var ms = new MemoryStream();
+                                file.CopyTo(ms);
+                                fileBytes = ms.ToArray();
+
+                                builder.Attachments.Add(file.FileName, fileBytes, ContentType.Parse(file.ContentType));
+                            }
+                        }
+                    }
+
+                    builder.HtmlBody = body;
+                    email.Body = builder.ToMessageBody();
+                    email.From.Add(new MailboxAddress(displayName, _settings.Email));
+
+                    using var smtp = new SmtpClient();
+                    smtp.Connect(_settings.Host, _settings.Port, SecureSocketOptions.StartTls);
+                    smtp.Authenticate(_settings.Email, _settings.Password);
+                    await smtp.SendAsync(email);
+                    smtp.Disconnect(true);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning($"Error in SendEmailAsync {ex.Message}");
+                }
             }
         }
     }

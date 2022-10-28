@@ -7,7 +7,7 @@ namespace StorApp.Services
 {
     public interface IBrandRepository
     {
-       
+
         Task<IList<Brand>?> GetBrandsForProductAsync(int productId);
         Task<Brand?> GetBrandForProductAsync(int productId, int brandId);
         Task<Brand> AddBrandAsync(Brand brand);

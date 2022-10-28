@@ -1,10 +1,6 @@
-﻿using SendGrid.Helpers.Mail;
-using SendGrid;
-using StorApp.Model;
-using StorApp.Services.StorApi.Services;
-using StorApp.Extensions;
-using System.Net.Mail;
-using System.Net;
+﻿using MailKit.Security;
+using MimeKit;
+using MailKit.Net.Smtp;
 
 namespace StorApp.Services
 {
@@ -19,39 +15,50 @@ namespace StorApp.Services
             _logger = logger;
         }
 
-        public async Task SendEmailAsync(string toEmail, string subject, string content)
+        public async Task SendEmailAsync(string mailTo, string subject, string body, string displayName, IList<IFormFile> attachments = null)
         {
-            //ToDo:
-
             try
             {
-                var fromMail = "<Add Your Email>";
-                var fromPassword = "<Add Your Password>";
-
-                var message = new MailMessage();
-
-                message.From = new MailAddress(_settings.Email);
-                message.Subject = subject;
-                message.To.Add(_settings.Email);
-                message.Body = $"<html><body>{content}</body></html>";
-                message.IsBodyHtml = true;
-
-                var smtpClient = new SmtpClient(_settings.Email)
+                var email = new MimeMessage
                 {
-                    Port = 587,
-                    Credentials = new NetworkCredential(fromMail, fromPassword),
-                    EnableSsl = true
+                    Sender = MailboxAddress.Parse(_settings.Email),
+                    Subject = subject
                 };
 
-                smtpClient.Send(message);
+                email.To.Add(MailboxAddress.Parse(mailTo));
+
+                var builder = new BodyBuilder();
+
+                if (attachments != null)
+                {
+                    byte[] fileBytes;
+                    foreach (var file in attachments)
+                    {
+                        if (file.Length > 0)
+                        {
+                            using var ms = new MemoryStream();
+                            file.CopyTo(ms);
+                            fileBytes = ms.ToArray();
+
+                            builder.Attachments.Add(file.FileName, fileBytes, ContentType.Parse(file.ContentType));
+                        }
+                    }
+                }
+
+                builder.HtmlBody = body;
+                email.Body = builder.ToMessageBody();
+                email.From.Add(new MailboxAddress(displayName, _settings.Email));
+
+                using var smtp = new SmtpClient();
+                smtp.Connect(_settings.Host, _settings.Port, SecureSocketOptions.StartTls);
+                smtp.Authenticate(_settings.Email, _settings.Password);
+                await smtp.SendAsync(email);
+                smtp.Disconnect(true);
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex.Message);
-                _logger.LogWarning(content);
+                _logger.LogWarning($"Error in SendEmailAsync {ex.Message}");
             }
-
         }
-
     }
 }

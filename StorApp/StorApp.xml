@@ -4,19 +4,19 @@
         <name>StorApp</name>
     </assembly>
     <members>
-        <member name="M:StorApp.Controllers.AuthenticationController.LoginAsync(StorApp.Model.UserManager.Login)">
-            <summary>
-            
-            </summary>
-            <param name="model"></param>
-            <returns></returns>
-        </member>
         <member name="M:StorApp.Controllers.AuthenticationController.RegisterAsync(StorApp.Model.UserManager.Register)">
             <summary>
              
             </summary>
             <param name="model">is model Include Email , Password and ConfirmPassword</param>
             <returns>return UserResponse</returns>
+        </member>
+        <member name="M:StorApp.Controllers.AuthenticationController.LoginAsync(StorApp.Model.UserManager.Login)">
+            <summary>
+            
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
         </member>
         <member name="M:StorApp.Controllers.ProductsController.GetProducts(System.String,System.Nullable{System.Int32},System.Int32,System.Int32,System.Int32)">
             <summary>
@@ -29,7 +29,7 @@
             <param name="pageSize">Page size, the default value is ten</param>
             <returns>List of products, maximum number of products {pageSize} </returns>
         </member>
-        <member name="M:StorApp.Services.IMailService.SendEmailAsync(System.String,System.String,System.String)">
+        <member name="M:StorApp.Services.IMailService.SendEmailAsync(System.String,System.String,System.String,System.String,System.Collections.Generic.IList{Microsoft.AspNetCore.Http.IFormFile})">
             <summary>
             
             </summary>

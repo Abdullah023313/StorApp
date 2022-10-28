@@ -108,6 +108,7 @@ builder.Services.AddScoped<IProductsRepository, ProductsRepository>();
 
 builder.Services.AddScoped<IUserService, UserService>();
 
+
 builder.Services.AddScoped<Settings>();
 
 #if DEBUG

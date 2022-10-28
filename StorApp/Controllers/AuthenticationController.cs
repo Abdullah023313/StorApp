@@ -31,21 +31,7 @@ namespace StorApp.Controllers
         }
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        [HttpPost("Login")]
-        public async Task<ActionResult> LoginAsync(Login model)
-        {
-            var result = await _userService.LoginUserAsync(model);
-
-            if (result.IsSuccess)
-                return Ok(result);
-
-            return BadRequest(result);
-        }
+      
 
         /// <summary>
         ///  
@@ -56,6 +42,22 @@ namespace StorApp.Controllers
         public async Task<ActionResult> RegisterAsync(Register model)
         {
             var result = await _userService.RegisterUserAsync(model);
+
+            if (result.IsSuccess)
+                return Ok(result);
+
+            return BadRequest(result);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost("Login")]
+        public async Task<ActionResult> LoginAsync(Login model)
+        {
+            var result = await _userService.LoginUserAsync(model);
 
             if (result.IsSuccess)
                 return Ok(result);
@@ -81,7 +83,7 @@ namespace StorApp.Controllers
 
 
         [HttpPost("ResetPassword")]
-        public async Task<IActionResult> ResetPassword([FromForm]ResetPassword model)
+        public async Task<ActionResult> ResetPassword([FromBody] ResetPassword model)
         {
             var result = await _userService.ResetPasswordAsync(model);
 
@@ -89,6 +91,20 @@ namespace StorApp.Controllers
                 return Ok(result);
 
             return BadRequest(result);
+        }
+
+        [HttpPost("ForgetPassword")]
+        public async Task<ActionResult> ForgetPassword(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+                return NotFound();
+
+            var result = await _userService.ForgetPasswordAsync(email);
+
+            if (result.IsSuccess)
+                return Ok(result); // 200
+
+            return BadRequest(result); // 400
         }
     }
 }

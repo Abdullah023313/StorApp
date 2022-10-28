@@ -21,6 +21,12 @@ namespace StorApp.Services
         Task<UserResponse> ConfirmEmailAsync(string userId, string token);
 
         Task<UserResponse> ResetPasswordAsync(ResetPassword model);
-        Task<List<UserDto>> GetUsers();
+
+        Task<UserResponse> ForgetPasswordAsync(string email);
+        Task<UserResponse> addRole(string rolename);
+        Task<UserResponse> updateRole(string oldRolename, string newRolename);
+
+        Task<UserResponse> addRoleToUser(string email, string rolename);
+
     }
 }

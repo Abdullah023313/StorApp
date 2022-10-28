@@ -10,6 +10,6 @@
         /// <param name="subject"></param>
         /// <param name="content"></param>
         /// <returns></returns>
-        Task SendEmailAsync(string toEmail, string subject, string content);
+        Task SendEmailAsync(string mailTo, string subject, string body, string displayName, IList<IFormFile> attachments = null);
     }
 }

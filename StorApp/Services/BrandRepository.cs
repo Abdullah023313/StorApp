@@ -6,7 +6,7 @@ using StorApp.Model;
 
 namespace StorApp.Services
 {
-    public class BrandRepository:IBrandRepository
+    public class BrandRepository : IBrandRepository
     {
         private readonly ILogger<BrandRepository> logger;
         private readonly StorDbContext context;
@@ -18,7 +18,7 @@ namespace StorApp.Services
             this.context = context;
 
         }
-     
+
 
         public async Task<IList<Brand>?> GetBrandsForProductAsync(int productId)
         {
@@ -50,7 +50,7 @@ namespace StorApp.Services
             var brandToPatch = new BrandDto()
             {
                 Name = brand.Name,
-                Notes=brand.Notes
+                Notes = brand.Notes
             };
 
             dto.ApplyTo(brandToPatch);
@@ -61,7 +61,7 @@ namespace StorApp.Services
             context.Brands.Update(brand);
             await context.SaveChangesAsync();
         }
-    
+
         public async Task DeleteBrandAsync(Brand brand)
         {
             context.Brands.Remove(brand);

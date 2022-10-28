@@ -50,7 +50,7 @@ namespace StorApp.Services
 
             return (filterProducts, paginationMetaData);
         }
-      
+
 
         public async Task<Product?> GetProductAsync(int productId, bool includeBrands = false)
         {
